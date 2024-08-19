@@ -1,0 +1,51 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Session {
+  session_id    String    @id @default(auto()) @map("_id") @db.ObjectId
+  id            String    @unique
+  shop          String
+  state         String
+  isOnline      Boolean   @default(false)
+  scope         String?
+  expires       DateTime?
+  accessToken   String
+  userId        BigInt?
+  firstName     String?
+  lastName      String?
+  email         String?
+  accountOwner  Boolean   @default(false)
+  locale        String?
+  collaborator  Boolean?  @default(false)
+  emailVerified Boolean?  @default(false)
+
+  googleAuth   GoogleAuth? @relation(fields: [googleAuthId], references: [session_id])
+  googleAuthId String?     @db.ObjectId
+}
+
+model GoogleAuth {
+  session_id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  id                    String    @unique
+  planType              String?   @default("starter")
+  emailVerified         String?
+  name                  String?
+  googleAccountId       String?
+  email                 String?   @unique
+  merchantCenterId      String?
+  selectedClientId      String?
+  access_token          String?
+  refresh_token         String?
+  createdCampaigns      Int?      @default(0)
+  campaignQuota         Int?      @default(0)
+  totalCreatedCampaigns Int?      @default(0)
+  Session               Session[]
+}
